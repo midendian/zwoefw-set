@@ -7,7 +7,16 @@
  * intention is that you'd only call this and check the error code; stdout is
  * useless and stderr only useful for debugging.
  *
- * gcc -o zwoefw-set zwoefw-set.c -lhidapi-libusb -Wall -Werror && sudo ./zwoefw-set ; echo $?
+ * Linux:
+ *   gcc -o zwoefw-set zwoefw-set.c -lhidapi-libusb -Wall -Werror
+ * OS X hidapi built from source:
+ *   gcc -o zwoefw-set zwoefw-set.c -L/.../hidapi/build/src/mac -lhidapi -Wall -Werror
+ * OS X hidapi from homebrew:
+ *   gcc -o zwoefw-set zwoefw-set.c -lhidapi -Wall -Werror
+ *
+ * Run:
+ *   ./zwoefw-set [<slot num>]; echo $?
+ * Moves to slot 1 if no arg given. May need sudo on Linux.
  *
  * Only tested with my one 7-slot device, obviously needs some work for other
  * variants and possibly other copies of the same variant.
@@ -243,6 +252,7 @@ main(int argc, char* argv[]) {
 
   int i;
 
+#ifndef __APPLE__ /* this segfaults on OS X, not interesting enough to debug */
   wchar_t wstr[255];
   res = hid_get_manufacturer_string(handle, wstr, sizeof(wstr));
   if (res != 0) goto errexit;
@@ -250,6 +260,7 @@ main(int argc, char* argv[]) {
   res = hid_get_product_string(handle, wstr, sizeof(wstr));
   if (res != 0) goto errexit;
   printf("Product String: %ls\n", wstr);
+#endif
 
   if (efw_get_info(handle) != 0)
     goto errexit;
