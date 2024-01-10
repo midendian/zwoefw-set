@@ -228,7 +228,7 @@ efw_get_position(hid_device *devh, uint8_t *slotret) {
 int
 main(int argc, char* argv[]) {
 
-  uint8_t targetslot = 1;
+  uint8_t targetslot = 0;
   if (argc > 1) {
     long int argint = strtol(argv[1], NULL, 10);
     if ( (argint < 1) || (argint > 7) ) {
@@ -274,6 +274,9 @@ main(int argc, char* argv[]) {
     } else if (res == 0) break;
     usleep(500*1000);
   }
+  if (targetslot == 0)
+    targetslot = slot; /* no change requested */
+
   while (slot != targetslot) {
 
     uint8_t nextslot = ((slot - 1 + 1) % 7) + 1;
@@ -295,6 +298,8 @@ main(int argc, char* argv[]) {
     }
     printf("current slot = %d\n", slot);
   }
+
+  printf("final slot = %d\n", slot);
 
   hid_close(handle);
   hid_exit();
